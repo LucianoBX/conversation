@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/conversation/sever/model"
+	"github.com/conversation/server/model"
 	"net"
 	"time"
 )
