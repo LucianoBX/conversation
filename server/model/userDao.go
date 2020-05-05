@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/conversation/common"
-	"github.com/garyburd/redigo/redis"
+	"github.com/gomodule/redigo/redis"
+	//"github.com/garyburd/redigo/redis"
 )
 
 // 做一个全局userDao，需要时直接调用
@@ -27,9 +28,10 @@ func NewUserDao(pool *redis.Pool) (userDao *UserDao) {
 
 // 为UserDao 创建需要的方法
 // 根据Id取得用户实例
-func (ud *UserDao) getUserByID(conn *redis.Conn, id int) (user *User, err error) {
+func (ud *UserDao) getUserById(conn redis.Conn, id int) (user *User, err error) {
 
 	// 通过给定id 去 redis 查询这个用户
+	//	iface, err := conn.Do("HGet", "users", id)
 	res, err := redis.String(conn.Do("HGet", "users", id))
 	if err != nil {
 		if err == redis.ErrNil {
@@ -50,13 +52,13 @@ func (ud *UserDao) getUserByID(conn *redis.Conn, id int) (user *User, err error)
 }
 
 //完成校验，并实现登录
-func (ud *UserDao) Login(userId int, userName string) (user *User, err error) {
+func (ud *UserDao) Login(userId int, userPwd string) (user *User, err error) {
 
 	// 获取conn
 	conn := ud.pool.Get()
 	defer conn.Close()
 
-	user, err = up.getUserById(conn, userId)
+	user, err = ud.getUserById(conn, userId)
 	if err != nil {
 		return
 	}
@@ -76,7 +78,7 @@ func (ud *UserDao) Register(user *common.User) (err error) {
 	conn := ud.pool.Get()
 	defer conn.Close()
 
-	_, err = up.getUserById(conn, userId)
+	_, err = ud.getUserById(conn, user.UserId)
 	if err == nil {
 		err = ERROR_USER_EXISTS
 		return
@@ -89,7 +91,7 @@ func (ud *UserDao) Register(user *common.User) (err error) {
 	}
 
 	//入库
-	_, err = conn.Do("HSet", "users", user.userId, string(data))
+	_, err = conn.Do("HSet", "users", user.UserId, string(data))
 	if err != nil {
 		fmt.Println("保存注册用户错误， err=", err)
 		return

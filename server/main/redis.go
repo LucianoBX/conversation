@@ -1,7 +1,8 @@
 package main
 
 import (
-	"github.com/redigo/redis"
+	"github.com/gomodule/redigo/redis"
+	//	"github.com/redigo/redis"
 	"time"
 )
 

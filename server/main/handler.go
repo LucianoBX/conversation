@@ -9,20 +9,20 @@ import (
 	"net"
 )
 
-//先创建一个Processor 的结构体体
-type Processor struct {
+//先创建一个Handler 的结构体体
+type Handler struct {
 	Conn net.Conn
 }
 
 //编写一个ServerProcessMes 函数
 //功能：根据客户端发送消息种类不同，决定调用哪个函数来处理
-func (p *Processor) serverProcessMes(mes *message.Message) (err error) {
+func (h *Handler) serverProcessMes(mes *common.Message) (err error) {
 
 	//看看是否能接收到客户端发送的群发的消息
 	fmt.Println("mes=", mes)
 
 	switch mes.Type {
-	case message.LoginMesType:
+	case common.LoginMesType:
 		//处理登录登录
 		//创建一个UserProcess实例
 		up := &process2.UserProcess{
@@ -30,14 +30,14 @@ func (p *Processor) serverProcessMes(mes *message.Message) (err error) {
 		}
 		err = up.ServerProcessLogin(mes)
 
-	case message.RegisterMesType:
+	case common.RegisterMesType:
 		//处理注册
 		up := &process2.UserProcess{
 			Conn: p.Conn,
 		}
 		err = up.ServerProcessRegister(mes) // type : data
 
-	case message.SmsMesType:
+	case common.SmsMesType:
 		//创建一个SmsProcess实例完成转发群聊消息.
 		smsProcess := &process2.SmsProcess{}
 		smsProcess.SendGroupMes(mes)
@@ -48,7 +48,8 @@ func (p *Processor) serverProcessMes(mes *message.Message) (err error) {
 	return
 }
 
-func (p *Processor) process2() (err error) {
+// 持续发送消息
+func (p *Handler) process2() (err error) {
 
 	//循环的向客户端发送的信息
 	for {
