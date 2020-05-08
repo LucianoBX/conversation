@@ -25,21 +25,21 @@ func (h *Handler) serverProcessMes(mes *common.Message) (err error) {
 	case common.LoginMesType:
 		//处理登录登录
 		//创建一个UserProcess实例
-		up := &process2.UserProcess{
-			Conn: p.Conn,
+		up := &process.UserProcess{
+			Conn: h.Conn,
 		}
 		err = up.ServerProcessLogin(mes)
 
 	case common.RegisterMesType:
 		//处理注册
-		up := &process2.UserProcess{
+		up := &process.UserProcess{
 			Conn: p.Conn,
 		}
 		err = up.ServerProcessRegister(mes) // type : data
 
 	case common.SmsMesType:
 		//创建一个SmsProcess实例完成转发群聊消息.
-		smsProcess := &process2.SmsProcess{}
+		smsProcess := &process.SmsProcess{}
 		smsProcess.SendGroupMes(mes)
 
 	default:
@@ -49,14 +49,14 @@ func (h *Handler) serverProcessMes(mes *common.Message) (err error) {
 }
 
 // 持续发送消息
-func (p *Handler) process2() (err error) {
+func (h *Handler) sendProcess() (err error) {
 
 	//循环的向客户端发送的信息
 	for {
 		//这里我们将读取数据包，直接封装成一个函数readPkg(), 返回Message, Err
 		//创建一个Transfer 实例完成读包任务
 		tf := &utils.Transfer{
-			Conn: p.Conn,
+			Conn: h.Conn,
 		}
 		mes, err := tf.ReadPkg()
 		if err != nil {
@@ -70,7 +70,7 @@ func (p *Handler) process2() (err error) {
 
 		}
 
-		err = p.serverProcessMes(&mes)
+		err = h.serverProcessMes(&mes)
 		if err != nil {
 			return err
 		}

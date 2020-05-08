@@ -1,7 +1,12 @@
 package process
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/conversation/common"
+	"github.com/conversation/server/model"
+	"github.com/conversation/server/utils"
+	"net"
 )
 
 type UserProcess struct {
@@ -68,21 +73,21 @@ func (up *UserProcess) ServerProcessRegister(mes *common.Message) (err error) {
 	// 声明一个resMes
 	var resMes common.Message
 	resMes.Type = common.RegisterResMesType
-	var rgResMes message.RegisterResMes
+	var rgResMes common.RegisterResMes
 
 	// 用Redis数据库完成注册
 	err = model.MyUserDao.Register(&rgMes.User)
 
 	if err != nil {
 		if err == model.ERROR_USER_EXISTS {
-			registerResMes.Code = 505
-			registerResMes.Error = model.ERROR_USER_EXISTS.Error()
+			rgResMes.Code = 505
+			rgResMes.Error = model.ERROR_USER_EXISTS.Error()
 		} else {
-			registerResMes.Code = 506
-			registerResMes.Error = "注册发生未知错误..."
+			rgResMes.Code = 506
+			rgResMes.Error = "注册发生未知错误..."
 		}
 	} else {
-		registerResMes.Code = 200
+		rgResMes.Code = 200
 	}
 
 	data, err := json.Marshal(rgResMes)
@@ -152,7 +157,7 @@ func (up *UserProcess) ServerProcessLogin(mes *common.Message) (err error) {
 		//将当前在线用户的id 放入到loginResMes.UsersId
 		//遍历 userMgr.onlineUsers
 		for id, _ := range userMgr.onlineUsers {
-			loginResMes.UsersId = append(loginResMes.UsersId, id)
+			loginResMes.UserId = append(loginResMes.UserId, id)
 		}
 		fmt.Println(user, "登录成功")
 	}

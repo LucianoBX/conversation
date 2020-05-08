@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/conversation/client/process"
 	"os"
 )
 
@@ -19,7 +20,7 @@ func main() {
 		fmt.Println("------------登录多人聊天系统------------")
 		fmt.Println("\t\t\t 1 登录聊天室")
 		fmt.Println("\t\t\t 2 注册用户")
-		fmt.Println("\t\t\t 3 推出系统")
+		fmt.Println("\t\t\t 3 退出系统")
 		fmt.Println("\t\t\t 请选择（1-3）：")
 
 		fmt.Scanf("%d\n", &key)
@@ -35,7 +36,7 @@ func main() {
 
 			// 完成登录
 			up := &process.UserProcess{}
-			up.Login(userId, UserPwd)
+			up.Login(userId, userPwd)
 
 		case 2:
 			fmt.Println("注册用户")

@@ -1,11 +1,11 @@
 package process
 
 import (
-	"enconding/json"
+	"encoding/json"
 	"fmt"
-	"github.com/conversation/server/model"
-	"github.com/coversation/common"
-	"github.com/coversation/server/utils"
+	"github.com/conversation/common"
+	// "github.com/conversation/server/model"
+	"github.com/conversation/server/utils"
 	"net"
 )
 
@@ -37,7 +37,7 @@ func (sp *SmsProcess) SendGroupMes(mes *common.Message) {
 
 			continue
 		}
-		sp.SendMesToEachOnlineUser(data, up.conn)
+		sp.SendMesToEachOnlineUser(data, up.Conn)
 
 	}
 }

@@ -1,8 +1,8 @@
 package process
 
 import (
-	"enconding/binary"
-	"enconding/json"
+	"encoding/binary"
+	"encoding/json"
 	"fmt"
 	"github.com/conversation/client/utils"
 	"github.com/conversation/common"
@@ -13,7 +13,7 @@ import (
 type UserProcess struct{}
 
 // 注册用户
-func (up *UserProcess) Register(userId int, userPwd, username string) (err error) {
+func (up *UserProcess) Register(userId int, userPwd, userName string) (err error) {
 	conn, err := net.Dial("tcp", "localhost:8889")
 	if err != nil {
 		fmt.Println("net.Dial err= ", err)
@@ -27,13 +27,13 @@ func (up *UserProcess) Register(userId int, userPwd, username string) (err error
 	var mes common.Message
 	mes.Type = common.RegisterMesType
 
-	// registerMes Object
+	// rgMes Object
 	var rgMes common.RegisterMes
 	rgMes.User.UserId = userId
 	rgMes.User.UserPwd = userPwd
-	rgmes.User.UserName = userName
+	rgMes.User.UserName = userName
 
-	data, err := json.Marshal(registerMes)
+	data, err := json.Marshal(rgMes)
 	if err != nil {
 		fmt.Println("json.Marshal err= ", err)
 		return
@@ -66,13 +66,13 @@ func (up *UserProcess) Register(userId int, userPwd, username string) (err error
 	}
 
 	var rgResMes common.RegisterResMes
-	err = json.Unmarshal([]byte(mes.Data), &registerResMes)
-	if registerResMes.Code == 200 {
+	err = json.Unmarshal([]byte(mes.Data), &rgResMes)
+	if rgResMes.Code == 200 {
 		fmt.Println("注册成功，请登录")
 		os.Exit(0)
 	} else {
-		fmt.Println(registerResMes.Error)
-		os.Exist(0)
+		fmt.Println(rgResMes.Error)
+		os.Exit(0)
 	}
 	return
 }
@@ -94,7 +94,7 @@ func (up *UserProcess) Login(userId int, userPwd string) (err error) {
 
 	var loginMes common.LoginMes
 	loginMes.UserId = userId
-	loginMes.Userpwd = userPwd
+	loginMes.UserPwd = userPwd
 
 	// 序列化
 	data, err := json.Marshal(loginMes)
@@ -116,7 +116,7 @@ func (up *UserProcess) Login(userId int, userPwd string) (err error) {
 	var buf [4]byte
 	binary.BigEndian.PutUint32(buf[:4], pkgLen)
 
-	n, err := conn.Write(buf[:4], pkgLen)
+	n, err := conn.Write(buf[:4])
 	if n != 4 || err != nil {
 		fmt.Println("conn.Write fail err= ", err)
 		return
@@ -144,12 +144,12 @@ func (up *UserProcess) Login(userId int, userPwd string) (err error) {
 
 	// 将mes的Data部分反序列化程LoginResMes
 	var loginResMes common.LoginResMes
-	err = json.Unmarshal([]byte(mes.Data), &loginResmes)
+	err = json.Unmarshal([]byte(mes.Data), &loginResMes)
 	if loginResMes.Code == 200 {
 		// 初始化CurrUser
 		CurrUser.Conn = conn
 		CurrUser.UserId = userId
-		CurrUser.Userstatus = common.UserOnline
+		CurrUser.UserStatus = common.UserOnline
 
 		// 显示当前用户列表
 		fmt.Println("当前用户列表如下")
@@ -163,7 +163,7 @@ func (up *UserProcess) Login(userId int, userPwd string) (err error) {
 			// onlineuser 完成初始化
 			user := &common.User{
 				UserId:     v,
-				UserStatus: message.UserOnline,
+				UserStatus: common.UserOnline,
 			}
 			onlineUsers[v] = user
 		}
@@ -171,7 +171,7 @@ func (up *UserProcess) Login(userId int, userPwd string) (err error) {
 
 		// 开一个协程，保持和服务端的通讯，当服务段推送
 		// 更新本地用户列表
-		go severProcessMes(conn)
+		go serverProcessMes(conn)
 
 		// 显示登录成功的菜单
 		for {

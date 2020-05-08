@@ -7,7 +7,7 @@ import (
 )
 
 // 客户段维护的map
-var onlineUsers map[int]*common.User = make(map[int]*message.User, 16)
+var onlineUsers map[int]*common.User = make(map[int]*common.User, 16)
 var CurrUser model.CurrUser
 
 // 在客户端显示当前在线的用户
@@ -28,13 +28,13 @@ func updateUserStatus(notifyUserStatusMes *common.NotifyUserStatusMes) {
 	//
 	user, ok := onlineUsers[notifyUserStatusMes.UserId]
 	if !ok {
-		user = &message.User{
+		user = &common.User{
 			UserId: notifyUserStatusMes.UserId,
 		}
 	}
 
 	user.UserStatus = notifyUserStatusMes.Status
-	onlineusers[notifyUserStatusMes.UserId] = user
+	onlineUsers[notifyUserStatusMes.UserId] = user
 
 	outputOnlineUser()
 }

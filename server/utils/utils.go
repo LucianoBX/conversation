@@ -2,8 +2,8 @@ package utils
 
 import (
 	"encoding/binary"
-	"enconing/json"
-	"errors"
+	"encoding/json"
+	//"errors"
 	"fmt"
 	"github.com/conversation/common"
 	"net"
@@ -16,7 +16,7 @@ type Transfer struct {
 	Buf [8096]byte
 }
 
-func (t *Transfer) ReadPkg() (mes message.Message, err errors) {
+func (t *Transfer) ReadPkg() (mes common.Message, err error) {
 
 	fmt.Println("读取客户端发送消息……")
 
@@ -38,7 +38,7 @@ func (t *Transfer) ReadPkg() (mes message.Message, err errors) {
 
 	// pkg反序列化
 	//
-	err = json.Unmarhal(t.Buf[:pkgLen], &mes)
+	err = json.Unmarshal(t.Buf[:pkgLen], &mes)
 	if err != nil {
 		fmt.Println("json.Unmarshal err = ", err)
 		return

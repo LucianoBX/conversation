@@ -1,9 +1,9 @@
 package process
 
 import (
-	"enconding/json"
+	"encoding/json"
 	"fmt"
-	"github.com/conversation/clint/utils"
+	"github.com/conversation/client/utils"
 	"github.com/conversation/common"
 )
 
@@ -19,11 +19,11 @@ func (sp *SmsProcess) SendGroupMes(content string) (err error) {
 
 	// 创建SmsMes
 	var smsMes common.SmsMes
-	smsMes.Content = contect
+	smsMes.Content = content
 	smsMes.UserId = CurrUser.UserId
 	smsMes.UserStatus = CurrUser.UserStatus
 
-	data, err := json.Marshl(smsMes)
+	data, err := json.Marshal(smsMes)
 	if err != nil {
 		fmt.Println("SentGropMes json.Marshal sms fail = ", err)
 		return
